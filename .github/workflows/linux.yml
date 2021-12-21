@@ -99,46 +99,46 @@ jobs:
           GITHUB_USERNAME: ${{ github.repository_owner }}
         if: env.SHOULD_BUILD == 'yes' && env.SHOULD_DEPLOY == 'yes'
 
-  snap:
-    needs: release
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-        - amd64
-        - arm64
+#   snap:
+#     needs: release
+#     runs-on: ubuntu-latest
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         platform:
+#         - amd64
+#         - arm64
 
-    steps:
-      - uses: actions/checkout@v2
+#     steps:
+#       - uses: actions/checkout@v2
 
-      - name: Check version
-        run: ./stores/snapcraft/check_version.sh
-        env:
-          ARCHITECTURE: ${{ matrix.platform }}
-          SNAP_STORE_LOGIN: ${{ secrets.SNAP_STORE_LOGIN }}
+#       - name: Check version
+#         run: ./stores/snapcraft/check_version.sh
+#         env:
+#           ARCHITECTURE: ${{ matrix.platform }}
+#           SNAP_STORE_LOGIN: ${{ secrets.SNAP_STORE_LOGIN }}
 
-      - uses: docker/setup-qemu-action@v1
-        with:
-          image: tonistiigi/binfmt@sha256:df15403e06a03c2f461c1f7938b171fda34a5849eb63a70e2a2109ed5a778bde
-        if: env.SHOULD_DEPLOY == 'yes'
+#       - uses: docker/setup-qemu-action@v1
+#         with:
+#           image: tonistiigi/binfmt@sha256:df15403e06a03c2f461c1f7938b171fda34a5849eb63a70e2a2109ed5a778bde
+#         if: env.SHOULD_DEPLOY == 'yes'
 
-      - uses: diddlesnaps/snapcraft-multiarch-action@v1
-        with:
-          path: stores/snapcraft
-          architecture: ${{ matrix.platform }}
-        id: build
-        if: env.SHOULD_DEPLOY == 'yes'
+#       - uses: diddlesnaps/snapcraft-multiarch-action@v1
+#         with:
+#           path: stores/snapcraft
+#           architecture: ${{ matrix.platform }}
+#         id: build
+#         if: env.SHOULD_DEPLOY == 'yes'
 
-      - uses: diddlesnaps/snapcraft-review-action@v1
-        with:
-          snap: ${{ steps.build.outputs.snap }}
-          isClassic: 'true'
-        if: env.SHOULD_DEPLOY == 'yes'
+#       - uses: diddlesnaps/snapcraft-review-action@v1
+#         with:
+#           snap: ${{ steps.build.outputs.snap }}
+#           isClassic: 'true'
+#         if: env.SHOULD_DEPLOY == 'yes'
 
-      - uses: snapcore/action-publish@v1
-        with:
-          store_login: ${{ secrets.SNAP_STORE_LOGIN }}
-          snap: ${{ steps.build.outputs.snap }}
-          release: stable
-        if: env.SHOULD_DEPLOY == 'yes'
+#       - uses: snapcore/action-publish@v1
+#         with:
+#           store_login: ${{ secrets.SNAP_STORE_LOGIN }}
+#           snap: ${{ steps.build.outputs.snap }}
+#           release: stable
+#         if: env.SHOULD_DEPLOY == 'yes'
